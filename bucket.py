@@ -382,27 +382,28 @@ def undo_teach(willie, trigger):
     del last_teach[trigger.sender]
 
 
-@rule('((^\001ACTION (gives|hands) $nickname)|^$nickname. (take|have) (this|my|your|.*)) (.*)')
+@rule('(?:(?:^\001ACTION (?:gives|hands) $nickname)|^$nickname. (?:take|have) (this|my|your|.*)) (.*)')
+@rule('(?:(?:^\001ACTION (?:gives|hands) (?:(this|my|your|.+) )?(.*)) )to $nickname')
 @priority('medium')
 def inv_give(willie, trigger):
     ''' Called when someone gives us an item '''
     bucket_runtime_data.inhibit_reply = trigger
     was = bucket_runtime_data.what_was_that
     inventory = bucket_runtime_data.inventory
-    item = trigger.group(6)
+    item = trigger.group(2)
     if item.endswith('\001'):
         item = item[:-1]
     item = item.strip()
 
-    if trigger.group(5) == 'my':
+    if trigger.group(1) == 'my':
         item = '%s\'s %s' % (trigger.nick, item)
-    elif trigger.group(5) == 'your':
+    elif trigger.group(1) == 'your':
         item = '%s\'s %s' % (willie.nick, item)
-    elif trigger.group(5) != 'this' and trigger.group(5) is not None:
-        item = '%s %s' % (trigger.group(5), item)
+    elif trigger.group(1) != 'this' and trigger.group(1) is not None:
+        item = '%s %s' % (trigger.group(1), item)
         item = re.sub(r'^me ', trigger.nick + ' ', item, re.IGNORECASE)
-    if trigger.group(3) is not '':
         item = re.sub(r'^his ', '%s\'s ' % trigger.nick, item, re.IGNORECASE)
+    if trigger.group(1) is not '':
 
     item = item.strip()
     dropped = inventory.add(item, trigger.nick, trigger.sender, willie)
@@ -431,15 +432,16 @@ def inv_give(willie, trigger):
     return
 
 
-@rule('^\001ACTION (steals|takes) $nickname\'s (.*)')
+@rule('^\001ACTION (?:steals|takes) $nickname\'s (.*)')
+@rule('^\001ACTION (?:steals|takes) (.*) from $nickname')
 @priority('medium')
 def inv_steal(willie, trigger):
     inventory = bucket_runtime_data.inventory
-    item = trigger.group(2)
+    item = trigger.group(1)
     bucket_runtime_data.inhibit_reply = trigger
     if item.endswith('\001'):
         item = item[:-1]
-    if (inventory.remove(item)):
+    if (inventory.remove(item)) or (inventory.remove('a %s' % item)) or (inventory.remove('an %s' % item)):
         willie.say('Hey! Give it back, it\'s mine!')
     else:
         willie.say('But I don\'t have any %s' % item)
