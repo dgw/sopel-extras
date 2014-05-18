@@ -382,8 +382,8 @@ def undo_teach(willie, trigger):
     del last_teach[trigger.sender]
 
 
-@rule('(?:(?:^\001ACTION (?:gives|hands) $nickname)|^$nickname. (?:take|have) (this|my|your|.*)) (.*)')
-@rule('(?:(?:^\001ACTION (?:gives|hands) (?:(this|my|your|.+) )?(.*)) )to $nickname')
+@rule('(?:(?:^\001ACTION (?:gives|hands) $nickname)(?: an?)?|^$nickname. (?:take|have) (this|my|your|an?|.*)) (.*)')
+@rule('(?:(?:^\001ACTION (?:gives|hands) (?:(this|my|your|an?|.+) )?(.*)) )to $nickname')
 @priority('medium')
 def inv_give(willie, trigger):
     ''' Called when someone gives us an item '''
@@ -433,7 +433,7 @@ def inv_give(willie, trigger):
 
 
 @rule('^\001ACTION (?:steals|takes) $nickname\'s (.*)')
-@rule('^\001ACTION (?:steals|takes) (.*) from $nickname')
+@rule('^\001ACTION (?:steals|takes) (?:an? )?(.*) from $nickname')
 @priority('medium')
 def inv_steal(willie, trigger):
     inventory = bucket_runtime_data.inventory
