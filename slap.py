@@ -21,7 +21,8 @@ def slap(sopel, trigger):
     if text[1].startswith('#'):
         return
     if text[1] == 'me' or text[1] == 'myself':
-        text[1] = trigger.nick
+        if Identifier(text[1]) not in sopel.privileges[trigger.sender.lower()]:
+            text[1] = trigger.nick
     try:
         if Identifier(text[1]) not in sopel.privileges[trigger.sender.lower()]:
             sopel.say("You can't slap someone who isn't here!")
