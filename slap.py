@@ -37,5 +37,5 @@ def slap(sopel, trigger):
     if text[1] in sopel.config.core.admins:
         if (trigger.nick not in sopel.config.core.admins):
             text[1] = trigger.nick
-    verb = random.choice(('slaps', 'kicks', 'destroys', 'annihilates', 'punches', 'roundhouse kicks', 'pwns', 'owns', 'backstabs'))
+    verb = random.choice(('slaps', 'kicks', 'destroys', 'annihilates', 'punches', 'roundhouse kicks', 'pwns', 'owns', 'backstabs', 'electrocutes'))
     sopel.write(['PRIVMSG', trigger.sender, ' :\x01ACTION', verb, text[1], '\x01'])
